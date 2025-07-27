@@ -3,8 +3,7 @@ $ErrorActionPreference = "Stop" # Stoppt das Skript bei einem Fehler
 
 # --- Variablen ---
 $ProjectDir = "TTS" # Name des bestehenden Projektverzeichnisses
-$CoquiRepo = "" # Nicht benötigt, da Projekt bereits vorhanden
-$TrainScriptFileName = "train_lightning_ai.py"
+# Nicht benötigt, da Projekt bereits vorhanden
 $DockerfileFileName = "Dockerfile"
 $TotalSteps = 3 # Gesamtzahl der Hauptschritte für den Fortschritt (Docker-Test optional)
 
@@ -36,7 +35,7 @@ function Use-ExistingProject {
     Write-SubStatus "Erfolg: Im Verzeichnis '$(Get-Location)' angekommen."
 }
 
-function Create-Dockerfile {
+function New-Dockerfile {
     Write-StepStatus 2 "Konfiguration: Dockerfile '$DockerfileFileName' erstellen"
     Write-SubStatus "Definiere den Inhalt für das Dockerfile..."
     $dockerfileContent = @"
@@ -263,7 +262,7 @@ Write-Host "Dies umfasst $TotalSteps Hauptschritte (+ 1 optionaler Schritt)." -F
 
 # Rufe die Funktionen in der richtigen Reihenfolge auf
 Use-ExistingProject
-Create-Dockerfile
+New-Dockerfile
 Create-TrainScript
 Test-DockerImage
 

@@ -1,19 +1,33 @@
-ARG BASE=nvidia/cuda:11.8.0-base-ubuntu22.04
-FROM ${BASE}
+# Verwende ein offizielles Python-Image als Basis
+FROM python:3.9-slim
 
-RUN apt-get update && apt-get upgrade -y
-RUN apt-get install -y --no-install-recommends gcc g++ make python3 python3-dev python3-pip python3-venv python3-wheel espeak-ng libsndfile1-dev && rm -rf /var/lib/apt/lists/*
-RUN pip3 install llvmlite --ignore-installed
+# Setze das Arbeitsverzeichnis im Container
+WORKDIR /app
 
-# Install Dependencies:
-RUN pip3 install torch torchaudio --extra-index-url https://download.pytorch.org/whl/cu118
-RUN rm -rf /root/.cache/pip
+# Kopiere die requirements.txt in den Container und installiere die Abhängigkeiten
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy TTS repository contents:
-WORKDIR /root
-COPY . /root
+# --- WICHTIG: PyTorch mit CUDA-Unterstützung installieren ---
+# Wähle die passende CUDA-Version für deine Lightning AI GPU-Instanz!
+# Beispiel: cu118 für CUDA 11.8. Wenn Lightning AI z.B. CUDA 12.1 hat, nutze cu121.
+# Prüfe die Lightning AI Dokumentation für die empfohlenen PyTorch/CUDA-Versionen.
+RUN pip install --no-cache-dir torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
 
-RUN make install
+# Kopiere den gesamten Projektordner (TTS_Stimmklon) in den Container
+# Dies beinhaltet Coqui TTS und deine train_lightning_ai.py
+COPY . .
 
-ENTRYPOINT ["tts"]
-CMD ["--help"]
+# Installiere Coqui TTS im Container im "editable" Modus
+# Dies stellt sicher, dass alle Coqui TTS Skripte und Module verfügbar sind
+RUN pip install -e .
+
+# Optional: Wenn du deine Trainingsdaten direkt ins Image packen möchtest (nur für kleine Datensätze!)
+# Annahme: Deine Daten liegen im lokalen Ordner 'my_custom_voice_dataset'
+COPY my_custom_voice_dataset /app/my_custom_voice_dataset
+
+# Definiere den Befehl, der ausgeführt wird, wenn der Container startet.
+# Da Lightning AI das Trainingsskript direkt startet, kann dies einfach ein "Sleep" sein,
+# oder ein Befehl, der die Umgebung initialisiert.
+# Wir setzen hier einfach 'bash', da Lightning AI den Entrypoint überschreibt.
+CMD ["bash"]

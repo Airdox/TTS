@@ -18,7 +18,8 @@ from TTS.config import BaseDatasetConfig, BaseAudioConfig
 from TTS.tts.datasets import load_tts_samples
 from TTS.utils.audio import AudioProcessor
 from TTS.utils.generic_utils import setup_logger
-from TTS.trainer.torch_config import TrainerConfig
+# Entferne ungültigen Import, da "TTS.trainer.torch_config" nicht aufgelöst werden kann
+# from TTS.trainer.torch_config import TrainerConfig
 
 # Setup Logging
 logging.basicConfig(level=logging.INFO)

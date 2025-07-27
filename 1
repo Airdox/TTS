@@ -1,0 +1,164 @@
+#!/bin/bash
+
+# Lightning AI Deployment Script für TTS Projekt
+echo "=== Lightning AI TTS Projekt Deployment ==="
+
+# Farbcodes für bessere Lesbarkeit
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+# Funktion für Erfolgsmeldungen
+success() {
+    echo -e "${GREEN}✓ $1${NC}"
+}
+
+# Funktion für Warnungen
+warning() {
+    echo -e "${YELLOW}⚠ $1${NC}"
+}
+
+# Funktion für Fehler
+error() {
+    echo -e "${RED}✗ $1${NC}"
+    exit 1
+}
+
+# 1. Prüfen ob Python installiert ist
+echo "Prüfe Python Installation..."
+if ! command -v python &> /dev/null; then
+    error "Python ist nicht installiert oder nicht im PATH"
+fi
+success "Python gefunden"
+
+# 2. Prüfen ob pip installiert ist
+echo "Prüfe pip Installation..."
+if ! command -v pip &> /dev/null; then
+    error "pip ist nicht installiert"
+fi
+success "pip gefunden"
+
+# 3. Lightning AI installieren
+echo "Installiere Lightning AI..."
+pip install lightning || error "Lightning AI Installation fehlgeschlagen"
+success "Lightning AI installiert"
+
+# 4. App.py erstellen falls nicht vorhanden
+if [ ! -f "app.py" ]; then
+    echo "Erstelle app.py..."
+    cat > app.py << 'EOF'
+import lightning as L
+from lightning.app import LightningApp, LightningFlow
+import os
+
+class TTSFlow(LightningFlow):
+    def __init__(self):
+        super().__init__()
+    
+    def run(self):
+        print("🎵 TTS App gestartet!")
+        print("Projektverzeichnis:", os.getcwd())
+        print("Verfügbare Dateien:", os.listdir('.'))
+
+class TTSApp(LightningApp):
+    def __init__(self):
+        super().__init__(TTSFlow())
+
+app = TTSApp()
+EOF
+    success "app.py erstellt"
+else
+    warning "app.py bereits vorhanden, wird übersprungen"
+fi
+
+# 5. requirements.txt erstellen falls nicht vorhanden
+if [ ! -f "requirements.txt" ]; then
+    echo "Erstelle requirements.txt..."
+    cat > requirements.txt << 'EOF'
+lightning
+torch
+torchaudio
+numpy
+scipy
+librosa
+soundfile
+transformers
+EOF
+    success "requirements.txt erstellt"
+else
+    warning "requirements.txt bereits vorhanden, wird übersprungen"
+fi
+
+# 6. .lightningignore erstellen
+echo "Erstelle .lightningignore..."
+cat > .lightningignore << 'EOF'
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/
+.mypy_cache/
+.pytest_cache/
+.hypothesis/
+.DS_Store
+*.swp
+*.swo
+*~
+EOF
+success ".lightningignore erstellt"
+
+# 7. Lightning Login prüfen
+echo "Prüfe Lightning AI Login Status..."
+if ! lightning whoami &> /dev/null; then
+    warning "Nicht bei Lightning AI angemeldet"
+    echo "Führe Lightning Login aus..."
+    lightning login || error "Lightning Login fehlgeschlagen"
+fi
+success "Bei Lightning AI angemeldet"
+
+# 8. Projekt validieren
+echo "Validiere Projektstruktur..."
+if [ ! -f "app.py" ] || [ ! -f "requirements.txt" ]; then
+    error "Projektstruktur unvollständig"
+fi
+success "Projektstruktur validiert"
+
+# 9. Deployment Optionen anzeigen
+echo ""
+echo "=== Deployment Optionen ==="
+echo "1. Lokal testen: lightning run app app.py"
+echo "2. In der Cloud deployen: lightning run app app.py --cloud"
+echo "3. Mit benutzerdefinierten Ressourcen: lightning run app app.py --cloud --cloud-compute gpu"
+echo ""
+
+# 10. Benutzer fragen was er möchte
+read -p "Möchten Sie das Projekt jetzt deployen? (y/N): " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    echo "Starte Cloud Deployment..."
+    lightning run app app.py --cloud || error "Cloud Deployment fehlgeschlagen"
+    success "Projekt erfolgreich bei Lightning AI deployed!"
+else
+    success "Setup abgeschlossen. Sie können manuell deployen mit: lightning run app app.py --cloud"
+fi
+
+echo ""
+echo "=== Deployment Script abgeschlossen ==="
+echo "Projektverzeichnis: $(pwd)"
+echo "Lightning AI Dashboard: https://lightning.ai"
+EOF
