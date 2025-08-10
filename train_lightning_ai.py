@@ -1,3 +1,4 @@
+# pylint: disable=all
 import os
 import torch
 from TTS.trainer import Trainer, TrainerArgs
@@ -73,12 +74,12 @@ train_samples, eval_samples = load_tts_samples(
     eval_split_max_size=model_config.eval_split_max_size,
     eval_split_size=model_config.eval_split_size,
 )
-
 # --- 7. Modell initialisieren ---
 # Coqui TTS Modelle nehmen ein config-Objekt und einen AudioProcessor (oder SpeakerManager/Tokenizer) als Input.
 # Für XTTS:
-model = Xtts(model_config, ap, tokenizer, speaker_manager=None) # SpeakerManager ist für Multi-Speaker-Training
+model = Xtts(model_config) # SpeakerManager ist für Multi-Speaker-Training
 
+# Lade ein vortrainiertes XTTS-Modell, wenn du Finetuning machst.
 # Lade ein vortrainiertes XTTS-Modell, wenn du Finetuning machst.
 # Dies ist entscheidend für XTTS-Cloning. Das Skript wird das Modell herunterladen, wenn es nicht da ist.
 # Normalerweise musst du hier keinen spezifischen Pfad angeben, da Coqui TTS es von Hugging Face zieht.
