@@ -116,7 +116,7 @@ trainer = Trainer(
 )
 
 # --- 9. Starte das Training ---
-Write-Host "Starte das Training des Stimmklon-Modells auf Lightning AI..."
+print("Starte das Training des Stimmklon-Modells auf Lightning AI..."); 
 print(f"Dataset Pfad im Container: {dataset_config.path}")
 print(f"Output Pfad: {output_path}")
 print(f"Anzahl Trainingssamples: {len(train_samples)}")
