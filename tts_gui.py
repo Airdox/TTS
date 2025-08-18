@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
-from TTS.api import TTS
+from TTS.api import synthesize
 
 class TTSApp:
     def __init__(self, master):  # Umbenennen von 'root' zu 'master', um Konflikte zu vermeiden
+        print("Initialisiere GUI...")  # Debugging-Ausgabe
         self.master = master
         self.master.title("TTS GUI")
 
@@ -40,13 +41,15 @@ class TTSApp:
             return
 
         try:
-            tts = TTS(model_name="tts_models/de/thorsten/tacotron2-DDC")
-            tts.tts_to_file(text=text, file_path=self.output_path)
+            result = synthesize(text)
+            with open(self.output_path, "w") as f:
+                f.write(result)
             messagebox.showinfo("Erfolg", "Die Sprachsynthese wurde erfolgreich abgeschlossen!")
         except Exception as e:
             messagebox.showerror("Fehler", f"Ein Fehler ist aufgetreten: {e}")
 
 if __name__ == "__main__":
+    print("Starte Tkinter...")  # Debugging-Ausgabe
     root = tk.Tk()
     app = TTSApp(root)
     root.mainloop()
