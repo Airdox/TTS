@@ -3,23 +3,23 @@ from tkinter import filedialog, messagebox
 from TTS.api import TTS
 
 class TTSApp:
-    def __init__(self, root):
-        self.root = root
-        self.root.title("TTS GUI")
+    def __init__(self, master):  # Umbenennen von 'root' zu 'master', um Konflikte zu vermeiden
+        self.master = master
+        self.master.title("TTS GUI")
 
-        self.label = tk.Label(root, text="Geben Sie den Text ein, den Sie in Sprache umwandeln möchten:")
+        self.label = tk.Label(master, text="Geben Sie den Text ein, den Sie in Sprache umwandeln möchten:")
         self.label.pack(pady=10)
 
-        self.text_entry = tk.Entry(root, width=50)
+        self.text_entry = tk.Entry(master, width=50)
         self.text_entry.pack(pady=10)
 
-        self.synthesize_button = tk.Button(root, text="Synthese starten", command=self.synthesize)
+        self.synthesize_button = tk.Button(master, text="Synthese starten", command=self.synthesize)
         self.synthesize_button.pack(pady=10)
 
-        self.output_label = tk.Label(root, text="Wählen Sie den Speicherort für die Ausgabedatei:")
+        self.output_label = tk.Label(master, text="Wählen Sie den Speicherort für die Ausgabedatei:")
         self.output_label.pack(pady=10)
 
-        self.output_button = tk.Button(root, text="Speicherort auswählen", command=self.select_output_path)
+        self.output_button = tk.Button(master, text="Speicherort auswählen", command=self.select_output_path)
         self.output_button.pack(pady=10)
 
         self.output_path = None
