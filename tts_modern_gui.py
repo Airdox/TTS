@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 import os
 import sys
+import tempfile
 
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
@@ -18,11 +19,14 @@ class ModernTTSApp(tk.Tk):
         self.title("TTS & Voice Cloning Studio")
         self.geometry("700x600")
         self.configure(bg=APP_COLOR)
-        self.iconify()
-        self.deiconify()
         self.resizable(False, False)
         self.create_style()
         self.create_widgets()
+        
+        # Bring window to front
+        self.lift()
+        self.attributes('-topmost', True)
+        self.after_idle(self.attributes, '-topmost', False)
 
     def create_style(self):
         style = ttk.Style(self)
@@ -90,12 +94,14 @@ class ModernTTSApp(tk.Tk):
     def synthesize_quick(self):
         """Kurzer Test: synthesize a short demo using the selected model and save to temp WAV"""
         demo_text = "Das ist ein kurzer Test der Thorsten-Stimme."
-        import tempfile
         out = os.path.join(tempfile.gettempdir(), "tts_demo_output.wav")
-        # Reuse synthesize flow
+        
+        # Set text and output path
         self.tts_text.delete("1.0", tk.END)
         self.tts_text.insert(tk.END, demo_text)
         self.tts_output_path.set(out)
+        
+        # Start synthesis
         self.synthesize_tts()
 
     def create_clone_tab(self, frame):
@@ -156,16 +162,28 @@ class ModernTTSApp(tk.Tk):
         if not output:
             messagebox.showerror("Fehler", "Bitte wählen Sie einen Speicherort für die Ausgabedatei.")
             return
+        
+        # Show loading cursor
+        self.config(cursor="wait")
+        self.update()
+        
         try:
             from TTS.api import TTS
-            # use model selected in the UI (defaults to Thorsten)
-            selected_model = getattr(self, 'tts_model_var', None)
-            model_name = selected_model.get() if selected_model is not None else "tts_models/de/thorsten/tacotron2-DDC"
-            tts = TTS(model_name=model_name)
+            # Use model selected in the UI (defaults to Thorsten)
+            model_name = getattr(self, 'tts_model_var', None)
+            if model_name and hasattr(model_name, 'get'):
+                selected_model = model_name.get()
+            else:
+                selected_model = "tts_models/de/thorsten/tacotron2-DDC"
+            
+            tts = TTS(model_name=selected_model)
             tts.tts_to_file(text=text, file_path=output)
-            messagebox.showinfo("Erfolg", "Die Sprachsynthese wurde erfolgreich abgeschlossen!")
+            
+            self.config(cursor="")
+            messagebox.showinfo("Erfolg", f"Die Sprachsynthese wurde erfolgreich abgeschlossen!\nDatei: {output}")
         except Exception as e:
-            messagebox.showerror("Fehler", f"Fehler bei der Sprachsynthese: {e}")
+            self.config(cursor="")
+            messagebox.showerror("Fehler", f"Fehler bei der Sprachsynthese: {str(e)}")
 
     def synthesize_clone(self):
         text = self.clone_text.get("1.0", tk.END).strip()
