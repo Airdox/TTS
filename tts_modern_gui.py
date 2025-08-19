@@ -56,6 +56,13 @@ class ModernTTSApp(tk.Tk):
         subtitle = ttk.Label(frame, text="Geben Sie Text ein und generieren Sie Sprache mit einem Klick.")
         subtitle.pack(pady=(0, 15))
 
+        # Model selection (default: Thorsten German model)
+        model_label = ttk.Label(frame, text="Modell auswählen:")
+        model_label.pack(anchor=tk.W, padx=10)
+        self.tts_model_var = tk.StringVar(value="tts_models/de/thorsten/tacotron2-DDC")
+        model_combo = ttk.Combobox(frame, textvariable=self.tts_model_var, values=["tts_models/de/thorsten/tacotron2-DDC", "tts_models/en/ljspeech/glow-tts"], state="readonly")
+        model_combo.pack(fill=tk.X, padx=10, pady=(0,10))
+
         text_label = ttk.Label(frame, text="Text eingeben:")
         text_label.pack(anchor=tk.W, padx=10)
         self.tts_text = tk.Text(frame, height=5, font=("Segoe UI", 11), bg=BG_COLOR, fg=FG_COLOR, insertbackground=FG_COLOR)
@@ -71,8 +78,25 @@ class ModernTTSApp(tk.Tk):
         output_btn = tk.Button(output_frame, text="Speichern unter", bg=BTN_COLOR, fg=BTN_TEXT, command=self.select_tts_output)
         output_btn.pack(side=tk.RIGHT, padx=(5,0))
 
+        # Quick test button (synthesize short sample)
+        quick_frame = tk.Frame(frame, bg=APP_COLOR)
+        quick_frame.pack(pady=(5,0))
+        quick_btn = tk.Button(quick_frame, text="Kurztest (Demo)", bg="#ffa500", fg=BTN_TEXT, command=self.synthesize_quick)
+        quick_btn.pack(side=tk.LEFT, padx=(0,8))
+
         synth_btn = tk.Button(frame, text="Sprachsynthese starten", bg=ACCENT_COLOR, fg=BTN_TEXT, font=("Segoe UI", 12, "bold"), command=self.synthesize_tts)
         synth_btn.pack(pady=20)
+
+    def synthesize_quick(self):
+        """Kurzer Test: synthesize a short demo using the selected model and save to temp WAV"""
+        demo_text = "Das ist ein kurzer Test der Thorsten-Stimme."
+        import tempfile
+        out = os.path.join(tempfile.gettempdir(), "tts_demo_output.wav")
+        # Reuse synthesize flow
+        self.tts_text.delete("1.0", tk.END)
+        self.tts_text.insert(tk.END, demo_text)
+        self.tts_output_path.set(out)
+        self.synthesize_tts()
 
     def create_clone_tab(self, frame):
         title = ttk.Label(frame, text="Voice Cloning", font=("Segoe UI", 18, "bold"), foreground=ACCENT_COLOR)
@@ -134,7 +158,10 @@ class ModernTTSApp(tk.Tk):
             return
         try:
             from TTS.api import TTS
-            tts = TTS(model_name="tts_models/de/thorsten/tacotron2-DDC")
+            # use model selected in the UI (defaults to Thorsten)
+            selected_model = getattr(self, 'tts_model_var', None)
+            model_name = selected_model.get() if selected_model is not None else "tts_models/de/thorsten/tacotron2-DDC"
+            tts = TTS(model_name=model_name)
             tts.tts_to_file(text=text, file_path=output)
             messagebox.showinfo("Erfolg", "Die Sprachsynthese wurde erfolgreich abgeschlossen!")
         except Exception as e:
@@ -164,4 +191,3 @@ class ModernTTSApp(tk.Tk):
 if __name__ == "__main__":
     app = ModernTTSApp()
     app.mainloop()
-docker run --rm ghcr.io/coqui-ai/tts-cpu python3 TTS/server/server.py --list_modelsdocker run --rm -it -p 5002:5002 ghcr.io/coqui-ai/tts-cpu python3 TTS/server/server.py --model_name tts_models/en/ljspeech/glow-tts
