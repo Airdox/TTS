@@ -1,4 +1,6 @@
 import tkinter as tk
+import torch
+from TTS.api import TTS
 from tkinter import filedialog, messagebox, ttk
 import os
 import sys
@@ -8,13 +10,13 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 class VoiceCloningApp:
     def __init__(self, master):
-        print("Initialisiere Voice Cloning GUI...")
+        print("Initialisiere Voice Cloning GUI...") # Debugging-Ausgabe
         self.master = master
         self.master.title("TTS Voice Cloning - Eigene Stimme klonen")
         self.master.geometry("600x500")
         
         # Variablen
-        self.speaker_wav_path = tk.StringVar()
+        self.speaker_wav_path = tk.StringVar() # Changed from ttk.StringVar() to tk.StringVar()
         self.output_path = tk.StringVar()
         
         self.create_widgets()
@@ -22,7 +24,7 @@ class VoiceCloningApp:
     def create_widgets(self):
         # Titel
         title_label = tk.Label(self.master, text="Voice Cloning - Klonen Sie Ihre eigene Stimme", 
-                              font=("Arial", 16, "bold"))
+                              font=("Arial", 16, "bold")) # Changed from ttk.Label() to tk.Label()
         title_label.pack(pady=10)
         
         # Anweisungen
@@ -34,21 +36,21 @@ class VoiceCloningApp:
         4. Klicken Sie auf "Voice Cloning starten"
         """
         instruction_label = tk.Label(self.master, text=instruction_text, justify=tk.LEFT, wraplength=550)
-        instruction_label.pack(pady=10)
+        instruction_label.pack(pady=10) # Changed from ttk.Label() to tk.Label()
         
         # Frame für Referenz-Audio
-        ref_frame = tk.Frame(self.master)
+        ref_frame = tk.Frame(self.master) # Changed from ttk.Frame() to tk.Frame()
         ref_frame.pack(pady=10, padx=20, fill=tk.X)
         
-        tk.Label(ref_frame, text="Referenz-Audiodatei (Ihre Stimme):").pack(anchor=tk.W)
-        ref_entry_frame = tk.Frame(ref_frame)
+        tk.Label(ref_frame, text="Referenz-Audiodatei (Ihre Stimme):").pack(anchor=tk.W) # Changed from ttk.Label() to tk.Label()
+        ref_entry_frame = tk.Frame(ref_frame) # Changed from ttk.Frame() to tk.Frame()
         ref_entry_frame.pack(fill=tk.X, pady=5)
         
-        tk.Entry(ref_entry_frame, textvariable=self.speaker_wav_path, state="readonly").pack(side=tk.LEFT, fill=tk.X, expand=True)
-        tk.Button(ref_entry_frame, text="Durchsuchen", command=self.select_speaker_wav).pack(side=tk.RIGHT, padx=(5,0))
+        tk.Entry(ref_entry_frame, textvariable=self.speaker_wav_path, state="readonly").pack(side=tk.LEFT, fill=tk.X, expand=True) # Changed from ttk.Entry() to tk.Entry()
+        tk.Button(ref_entry_frame, text="Durchsuchen", command=self.select_speaker_wav).pack(side=tk.RIGHT, padx=(5,0)) # Changed from ttk.Button() to tk.Button()
         
         # Frame für Text-Eingabe
-        text_frame = tk.Frame(self.master)
+        text_frame = tk.Frame(self.master) # Changed from ttk.Frame() to tk.Frame()
         text_frame.pack(pady=10, padx=20, fill=tk.BOTH, expand=True)
         
         tk.Label(text_frame, text="Text zum Sprechen:").pack(anchor=tk.W)
@@ -56,18 +58,18 @@ class VoiceCloningApp:
         self.text_widget.pack(fill=tk.BOTH, expand=True, pady=5)
         
         # Frame für Ausgabedatei
-        output_frame = tk.Frame(self.master)
+        output_frame = tk.Frame(self.master) # Changed from ttk.Frame() to tk.Frame()
         output_frame.pack(pady=10, padx=20, fill=tk.X)
         
-        tk.Label(output_frame, text="Ausgabedatei:").pack(anchor=tk.W)
-        output_entry_frame = tk.Frame(output_frame)
+        tk.Label(output_frame, text="Ausgabedatei:").pack(anchor=tk.W) # Changed from ttk.Label() to tk.Label()
+        output_entry_frame = tk.Frame(output_frame) # Changed from ttk.Frame() to tk.Frame()
         output_entry_frame.pack(fill=tk.X, pady=5)
         
-        tk.Entry(output_entry_frame, textvariable=self.output_path, state="readonly").pack(side=tk.LEFT, fill=tk.X, expand=True)
-        tk.Button(output_entry_frame, text="Speichern unter", command=self.select_output_path).pack(side=tk.RIGHT, padx=(5,0))
+        tk.Entry(output_entry_frame, textvariable=self.output_path, state="readonly").pack(side=tk.LEFT, fill=tk.X, expand=True) # Changed from ttk.Entry() to tk.Entry()
+        tk.Button(output_entry_frame, text="Speichern unter", command=self.select_output_path).pack(side=tk.RIGHT, padx=(5,0)) # Changed from ttk.Button() to tk.Button()
         
         # Frame für Buttons
-        button_frame = tk.Frame(self.master)
+        button_frame = tk.Frame(self.master) # Changed from ttk.Frame() to tk.Frame()
         button_frame.pack(pady=20)
         
         self.clone_button = tk.Button(button_frame, text="Voice Cloning starten", 
@@ -75,7 +77,7 @@ class VoiceCloningApp:
                                      font=("Arial", 12, "bold"))
         self.clone_button.pack(side=tk.LEFT, padx=10)
         
-        tk.Button(button_frame, text="Beenden", command=self.master.quit, 
+        tk.Button(button_frame, text="Beenden", command=self.master.quit, # Changed from ttk.Button() to tk.Button()
                  bg="#f44336", fg="white").pack(side=tk.LEFT, padx=10)
         
         # Progress bar
@@ -162,7 +164,7 @@ class VoiceCloningApp:
             print(f"Voice Cloning simuliert für: {text}")
 
 if __name__ == "__main__":
-    print("Starte Voice Cloning GUI...")
+    print("Starte Voice Cloning GUI...") # Debugging-Ausgabe
     root = tk.Tk()
     app = VoiceCloningApp(root)
     root.mainloop()
