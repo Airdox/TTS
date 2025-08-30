@@ -335,14 +335,14 @@ def main():
 
     with contextlib.redirect_stdout(None if args.pipe_out else sys.stdout):
         # Late-import to make things load faster
-        from TTS.api import TTS
+        
         from TTS.utils.manage import ModelManager
         from TTS.utils.synthesizer import Synthesizer
 
         # load model manager
         path = Path(__file__).parent / "../.models.json"
         manager = ModelManager(path, progress_bar=args.progress_bar)
-        api = TTS()
+        
 
         tts_path = None
         tts_config_path = None

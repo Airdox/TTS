@@ -28,5 +28,4 @@ tts_btn.pack(pady=10)
 info_label = tk.Label(root, text="Wenn Sie diese GUI sehen können, funktioniert Tkinter korrekt.")
 info_label.pack(pady=20)
 
-print("Starte einfache GUI...")
 root.mainloop()
