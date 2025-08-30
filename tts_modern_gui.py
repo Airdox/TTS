@@ -174,9 +174,9 @@ class ModernTTSApp(tk.Tk):
             if model_name and hasattr(model_name, 'get'):
                 selected_model = model_name.get()
             else:
-                selected_model = "tts_models/de/thorsten/tacotron2-DDC"
+                selected_model = "tts_models/de/thorsten/tacotron2-DDC" # Fallback to default
             
-            tts = TTS(model_name=selected_model)
+            tts = TTS(model_name=selected_model, gpu=False)
             tts.tts_to_file(text=text, file_path=output)
             
             self.config(cursor="")

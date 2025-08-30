@@ -92,7 +92,7 @@ class SimpleTTSApp:
             self.root.update()
             
             # Import and use TTS
-            from TTS.api import TTS
+            from TTS.api import TTS #no-space-check
             tts = TTS(model_name="tts_models/de/thorsten/tacotron2-DDC")
             tts.tts_to_file(text=text, file_path=output)
             
@@ -109,3 +109,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = SimpleTTSApp(root)
     root.mainloop()
+
+
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
